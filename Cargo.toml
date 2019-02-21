@@ -1,0 +1,10 @@
+[package]
+name = "r-crawler"
+version = "0.1.0"
+authors = ["rock huang <manj22@163.com>"]
+edition = "2018"
+
+[dependencies]
+reqwest = "0.9.9"
+log = "0.4"
+scraper = "0.9.1"

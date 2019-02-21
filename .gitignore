@@ -1,0 +1,10 @@
+/target
+**/*.rs.bk
+
+/.idea/encodings.xml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/r-crawler.iml
+/.idea/vcs.xml
+/.idea/workspace.xml
+/Cargo.lock
