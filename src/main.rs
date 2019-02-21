@@ -1,11 +1,9 @@
 mod util;
-extern crate reqwest;
 use reqwest as http;
 use scraper::Html;
 use scraper::Selector;
 use util::file;
 use util::url_parser;
-use log::__private_api_log;
 
 fn main()  {
     let files = file::get_files(r"D:\coding\ide").unwrap();

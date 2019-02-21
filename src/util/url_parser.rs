@@ -15,18 +15,12 @@ pub fn parse(html: &str) -> Vec<String>{
 fn fetch(doc:&Html, tag_name: &str, attr_name: &str) -> Vec<String>{
     let se = Selector::parse(tag_name).unwrap();
     let nodes = doc.select(&se);
-    println!("tag name: {}", tag_name);
     let mut vec:Vec<String> = Vec::new();
     for img in nodes {
         let src = img.value().attr(attr_name);
-
         if src.is_some() {
             vec.push(String::from(src.unwrap()));
         }
-        else {
-            println!("tag name: {:?}, attr: {:?}", img.value().name, img.value().attrs);
-        }
-
     }
     vec
 }
