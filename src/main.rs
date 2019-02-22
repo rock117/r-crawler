@@ -1,22 +1,19 @@
 mod util;
+mod html;
 use reqwest as http;
 use scraper::Html;
 use scraper::Selector;
 use util::file;
 use util::url_parser;
-
 fn main()  {
-    let files = file::get_files(r"D:\coding\ide").unwrap();
+   // let files = file::get_files(r"D:\coding\ide").unwrap();
 
-    println!("{:?}", files);
+   // println!("{:?}", files);
 
-    let mut resp =  http::get("https://www.douban.com/note/704764170/").unwrap();
-    let html = resp.text().unwrap();
 
-    let urls = url_parser::parse(html.as_ref());
-    for url in urls.iter() {
-        println!("{}", url);
-    }
+
+    let links = html::HtmlPage::from_url("https://www.douban.com/note/704764170/").links;
+    println!("links is {:?}\n", links);
 
 }
 
