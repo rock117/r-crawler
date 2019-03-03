@@ -3,7 +3,8 @@ use std::path::*;
 use std::io;
 use std::io::BufReader;
 use std::io::BufRead;
-
+use std::fs::File;
+use std::io::Write;
 //
 // 获取目录下的文件，不递归
 pub fn get_files<P: AsRef<Path>>(path: P)  -> io::Result<Vec<PathBuf>> {
@@ -38,4 +39,9 @@ pub fn read_lines<P: AsRef<Path>> (path:P) -> io::Result<Vec<String>>{
         all_lines.push(line?);
     }
     Result::Ok(all_lines)
+}
+
+pub fn write<P: AsRef<Path>> (file_name: P, content: &str) -> std::io::Result<()>  {
+    let mut file = File::create(file_name)?;
+    file.write_all(content.as_bytes())
 }

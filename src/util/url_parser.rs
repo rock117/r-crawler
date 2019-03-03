@@ -4,11 +4,10 @@ use scraper::Selector;
 pub fn parse(html: &str) -> Vec<String>{
     let doc = Html::parse_document(html);
     let mut vec = Vec::new();
-    vec.extend(fetch(&doc, "a", "src"));
+    vec.extend(fetch(&doc, "a", "href"));
     vec.extend(fetch(&doc, "script", "src"));
-    vec.extend(fetch(&doc, "link", "src"));
+    vec.extend(fetch(&doc, "link", "href"));
     vec.extend(fetch(&doc, "img", "src"));
-
     vec
 }
 
