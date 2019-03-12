@@ -59,11 +59,18 @@ impl<'a> Crawler<'a> {
             .filter(|&url| !self.has_crawled(url) && url != "#")
             .collect::<Vec<&String>>();
 
-        for link in links.iter() {
+        for link in links {
             self.crawled_urls.insert(link.to_string());
             self.crawl(link);
         }
     }
+
+
+
+
+
+
+
 }
 
 
