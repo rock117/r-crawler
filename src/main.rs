@@ -1,43 +1,37 @@
-use std::collections::HashSet;
-
 mod util;
 mod html;
 mod crawl;
+
 use crawl::Crawler;
+//use threadpool::ThreadPool;
+//use std::time::Duration;
+//use std::cell::Cell;
 
-use reqwest as http;
-use scraper::Html;
-use scraper::Selector;
-use util::file;
-use util::url_parser;
-
-
-struct Tmp{
-    age:i32
+fn main() {
+    let mut crawl: Crawler = Crawler::new("https://www.oschina.net/".to_owned());
+    crawl.start();
 }
-impl Drop for Tmp{
-    fn drop(&mut self){
-        println!("Tmp drop");
+
+struct M {
+    name: String
+}
+
+impl M {
+    fn init(&mut self) {
+        println!("init running...");
+        let n = self.name.clone();
+        let n = n.as_ref();
+        self.hello(n);
+    }
+    fn hello(&mut self, name: &str) {
+        println!("hello {}", name);
     }
 }
 
-fn main()  {
-//    let mut crawl = Crawler::new("https://www.163.com/");
-//    crawl.start();
-//    let url = "https://v.qq.com/x/cover/sduh9vi7i5578p9/n0026vvppfw.html";
-//    let path = url.replace("https://","").replace("http://","");
-//    println!("path is {}", path);
-    let a = "abc".trim_end_matches("c");
-    let b = "abc".trim_right_matches("c");
-    println!("{}:{}", a, b);
-}
 
-
-
-
-
-
-
+//println!("hello world");
+// let mut crawl: Crawler = Crawler::new("https://www.oschina.net/".to_owned());
+// crawl.start();
 
 
 

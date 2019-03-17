@@ -8,3 +8,6 @@ edition = "2018"
 reqwest = "0.9.9"
 log = "0.4"
 scraper = "0.9.1"
+threadpool = "1.7.1"
+
+# https://docs.rs/threadpool/1.7.1/threadpool/

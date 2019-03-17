@@ -6,6 +6,7 @@ pub struct HtmlPage{
 }
 
 impl  HtmlPage{
+
     pub fn from_html(html: &str) -> Self{
         HtmlPage{links: url_parser::parse(html)}
     }

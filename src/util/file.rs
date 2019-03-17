@@ -11,9 +11,7 @@ pub fn get_files<P: AsRef<Path>>(path: P)  -> io::Result<Vec<PathBuf>> {
     let dir = fs::read_dir(path)?;
     let mut files = Vec::new();
     for entry in dir {
-        let e = entry?;
-        let p = e.path();
-        files.push(p);
+        files.push(entry?.path());
     }
     Result::Ok(files)
 }
@@ -24,9 +22,9 @@ pub fn get_files_recurvly<P: AsRef<Path>>(path:P) -> io::Result<Vec<PathBuf>>{
     let files = get_files(path)?;
     let mut all_files:Vec<PathBuf> = Vec::new();
     for f in files.iter() {
-        if f.is_dir(){
+        if f.is_dir() {
             all_files.extend(get_files_recurvly(f)?);
-        }
+        } 
     }
     all_files.extend(files);
     Result::Ok(all_files)

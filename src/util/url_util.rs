@@ -19,7 +19,7 @@ pub fn get_final_host(url: &str, host: &str) -> String{
 
     String::from("");
 
-    if (index.is_some()) {
+    if index.is_some() {
         let i = index.unwrap();
         let b = &path[0 .. i];
     }
