@@ -9,5 +9,6 @@ reqwest = "0.9.9"
 log = "0.4"
 scraper = "0.9.1"
 threadpool = "1.7.1"
-
+libc = "0.2"
+hocon = "0.3.0"
 # https://docs.rs/threadpool/1.7.1/threadpool/
