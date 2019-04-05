@@ -17,13 +17,14 @@ pub struct Crawler {
     started: bool,
     crawled_urls: HashSet<String>,
     current_num: i32,
-    pool: ThreadPool
+    pool: ThreadPool,
+    chanel_num: usize
 }
 
 impl Crawler {
 
     pub fn new(entry: String) -> Self {
-        Crawler { entry, started: false, crawled_urls: HashSet::new(), current_num: 0, pool: ThreadPool::new(50)}
+        Crawler { entry, started: false, crawled_urls: HashSet::new(), current_num: 0, pool: ThreadPool::new(50), chanel_num: 500}
     }
 
     pub fn start(&mut self) {
@@ -31,7 +32,7 @@ impl Crawler {
             return;
         }
         let url = self.entry.clone();
-        let (tx, rx) = sync_channel(10);
+        let (tx, rx) = sync_channel(self.chanel_num);
 
         self.init(url, &tx);
         self.loop2(tx, rx)
@@ -39,15 +40,16 @@ impl Crawler {
 
     fn init(&mut self, url: String, tx: &SyncSender<(String, Response)>) {
         let t = tx.clone();
-        let n = self.current_num;
+        self.current_num += 1;
         self.pool.execute(move || {
-            crawl(n, url, t);
+            crawl(1, url, t);
         });
     }
 
     fn loop2(&mut self, tx: SyncSender<(String, Response)>, rx: Receiver<(String, Response)>) -> () {
         while let Ok((url, mut resp)) = rx.recv() {
-            let urls = self.handle_page(url.as_ref(), read_content(&mut resp).as_ref());
+            self.mark_crawled(url.clone());
+            let urls = self.parse_page_urls(url.as_ref(), read_content(&mut resp).as_ref());
             for url in urls {
                 let tx = tx.clone();
                 self.current_num = self.current_num + 1;
@@ -57,6 +59,10 @@ impl Crawler {
                 });
             }
         }
+    }
+
+    fn mark_crawled(&mut self, url: String){
+        self.crawled_urls.insert(url);
     }
 
     fn is_done(&self) -> bool {
@@ -69,7 +75,7 @@ impl Crawler {
         self.crawled_urls.contains(url)
     }
 
-    fn handle_page(&mut self, parent_url: &str, html: &str) -> Vec<String> {
+    fn parse_page_urls(&mut self, parent_url: &str, html: &str) -> Vec<String> {
         let links: Vec<String> = url_parser::parse(html);
         let links = links.iter()
             .map(|url| get_real_url(url, parent_url))
