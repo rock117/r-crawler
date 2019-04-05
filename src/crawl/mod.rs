@@ -12,6 +12,8 @@ use std::thread;
 use std::sync::mpsc::{sync_channel, SyncSender, Receiver};
 use std::io::Read;
 
+use crate::util::date_util;
+
 pub struct Crawler {
     entry: String,
     started: bool,
@@ -79,7 +81,7 @@ impl Crawler {
         let links: Vec<String> = url_parser::parse(html);
         let links = links.iter()
             .map(|url| get_real_url(url, parent_url))
-            .filter(|url| !self.has_crawled(url.as_ref()) && url.contains("oschina.net"))
+            .filter(|url| !self.has_crawled(url.as_ref()))
             .collect::<Vec<String>>();
         links
     }
@@ -101,7 +103,7 @@ fn parse_url(url: &str) -> Option<(&str, &str, &str)> {
     if !url.contains("http://") && !url.contains("https://") {
         return None;
     }
-    let url_parts: Vec<&str> = url.trim_left_matches("https://").trim_left_matches("http://")
+    let url_parts: Vec<&str> = url.trim_start_matches("https://").trim_start_matches("http://")
         .split("/").collect();
     let host = url_parts[0];
     let protocol: &str = url.split("://").collect::<Vec<&str>>()[0];
@@ -120,8 +122,10 @@ fn read_content(resp: &mut Response) -> String {
 
 
 fn crawl(curr: i32, url: String,   tx: SyncSender<(String, Response)>){
-    println!("Begin to crawl {} {}", curr, &url);
+    let start = date_util::current_milliseconds();
     let resp = http::get(url.as_ref() as &str);
+    let end = date_util::current_milliseconds();
+    println!("{} crawl cost {} ms, url: {}", curr, (end - start), &url);
     if resp.is_err() {
         return;
     }
