@@ -13,12 +13,12 @@ use std::sync::mpsc::{sync_channel, SyncSender, Receiver};
 use std::io::Read;
 
 use crate::util::date_util;
-
+use std::sync::atomic::{AtomicUsize, Ordering};
 pub struct Crawler {
     entry: String,
     started: bool,
     crawled_urls: HashSet<String>,
-    current_num: i32,
+    current_num: Arc<AtomicUsize>,
     pool: ThreadPool,
     chanel_num: usize
 }
@@ -26,7 +26,7 @@ pub struct Crawler {
 impl Crawler {
 
     pub fn new(entry: String) -> Self {
-        Crawler { entry, started: false, crawled_urls: HashSet::new(), current_num: 0, pool: ThreadPool::new(50), chanel_num: 500}
+        Crawler { entry, started: false, crawled_urls: HashSet::new(), current_num: Arc::new(AtomicUsize::new(0)), pool: ThreadPool::new(50), chanel_num: 500}
     }
 
     pub fn start(&mut self) {
@@ -42,9 +42,9 @@ impl Crawler {
 
     fn init(&mut self, url: String, tx: &SyncSender<(String, Response)>) {
         let t = tx.clone();
-        self.current_num += 1;
+        let arc = self.current_num.clone();
         self.pool.execute(move || {
-            crawl(1, url, t);
+            crawl(arc, url, t);
         });
     }
 
@@ -54,10 +54,9 @@ impl Crawler {
             let urls = self.parse_page_urls(url.as_ref(), read_content(&mut resp).as_ref());
             for url in urls {
                 let tx = tx.clone();
-                self.current_num = self.current_num + 1;
-                let n = self.current_num;
+                let arc = self.current_num.clone();
                 self.pool.execute(move || {
-                    crawl(n, url, tx);
+                    crawl(arc, url, tx);
                 });
             }
         }
@@ -68,7 +67,7 @@ impl Crawler {
     }
 
     fn is_done(&self) -> bool {
-        self.current_num > 1009
+        false
     }
 
 
@@ -121,11 +120,12 @@ fn read_content(resp: &mut Response) -> String {
 }
 
 
-fn crawl(curr: i32, url: String,   tx: SyncSender<(String, Response)>){
+fn crawl(curr: Arc<AtomicUsize>, url: String,   tx: SyncSender<(String, Response)>){
     let start = date_util::current_milliseconds();
     let resp = http::get(url.as_ref() as &str);
     let end = date_util::current_milliseconds();
-    println!("{} crawl cost {} ms, url: {}", curr, (end - start), &url);
+    curr.fetch_add(1,Ordering::SeqCst);
+    println!("{:?} crawl cost {} ms, url: {}", curr, (end - start), &url);
     if resp.is_err() {
         return;
     }
