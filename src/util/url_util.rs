@@ -12,8 +12,6 @@ pub fn get_final_host(url: &str, host: &str) -> String{
         return format!("{}{}", host, url);
     }
 
-
-
     let path = url.replace("https://","").replace("http://","");
     let index = path.find("/");
 
